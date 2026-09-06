@@ -154,7 +154,7 @@ docs/                       기능명세·검증·시연 순서
 
 API 구현 참고: [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state), [기본 예시 모델](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
 
-## ⭐ Contributors | 팀원
+###  Contributors | 팀원
 
 - 팀명: 하이바라 하이리턴
   

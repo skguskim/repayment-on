@@ -32,15 +32,16 @@ export function createWorker({assets,ask=askAI}={}) {
   return {async fetch(request,env){
     try {
       const url=new URL(request.url), pathname=decodeURIComponent(url.pathname);
+      const origins=(env.APP_ORIGINS||env.APP_ORIGIN||'').split(',').map(value=>value.trim()).filter(Boolean);
       if(pathname==='/api/status') {
         if(!['GET','HEAD'].includes(request.method))return json(405,{error:'GET만 지원합니다.'});
         if(request.method==='HEAD')return new Response(null,{headers:HEADERS});
-        const configured=Boolean(env.OPENAI_API_KEY && env.DB && env.APP_ORIGIN);
+        const configured=Boolean(env.OPENAI_API_KEY && env.DB && origins.length);
         return json(200,{configured,model:configured?(env.OPENAI_MODEL||'gpt-4.1-mini'):null,version:'2.0.0'});
       }
       if(pathname==='/api/assistant') {
         if(request.method!=='POST')return json(405,{error:'POST만 지원합니다.'});
-        if(!env.APP_ORIGIN || request.headers.get('origin')!==env.APP_ORIGIN)return json(403,{error:'허용된 서비스 주소에서만 AI를 호출할 수 있습니다.'});
+        if(!origins.includes(request.headers.get('origin')))return json(403,{error:'허용된 서비스 주소에서만 AI를 호출할 수 있습니다.'});
         if(request.headers.get('content-type')?.split(';')[0]!=='application/json')return json(415,{error:'application/json만 지원합니다.'});
         if(!env.OPENAI_API_KEY || !env.DB)return json(503,{error:'지금은 AI 상담을 사용할 수 없어요.'});
         const body=await readJSON(request);

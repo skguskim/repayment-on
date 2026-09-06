@@ -2,12 +2,15 @@
 
 청년의 미래소득 지급일·종료일과 생활비·부채를 함께 계산하는 현금흐름 시뮬레이터입니다. 개정 기획서의 인턴 급여 지연 사례를 재현합니다. 대출 승인·한도·신용평가·수령 확률을 예측하지 않습니다.
 
+**[배포된 서비스 바로 이용하기](https://repayment-on.checkdeep2025hanium.chatgpt.site)** — 회원가입이나 로그인 없이 접속할 수 있습니다.
+
 ## 실행
 
-Node.js 22 이상에서 실행합니다. 서버·웹 앱은 외부 패키지 없이 동작합니다.
+Node.js 22.13 이상에서 실행합니다. 로컬 서버·웹 앱은 별도 패키지 설치 없이 동작하며, 빌드와 자동 테스트에는 개발 의존성을 설치합니다.
 
 ```powershell
-cd mvp
+git clone https://github.com/skguskim/repayment-on.git
+cd repayment-on
 node server.mjs
 ```
 
@@ -19,7 +22,7 @@ Windows에서는 `run-local.ps1`로도 실행할 수 있습니다. 이 실행기
 
 ## 구현한 기능
 
-- 대학생·취업준비생·사회초년생 가상 사례, 직접 입력, 과거 6~12개월 자료의 중앙값 가져오기.
+- 대학생·취업준비생·사회초년생 가상 사례, 직접 입력, 과거 일정 기간 자료의 중앙값 가져오기.
 - 유동자금, 최소 유지 잔액, 필수 생활비, 유지할 선택지출, 비정기 지출 예산.
 - 인턴·급여·상금·장학금: 확정/미확정, 일회/매월, 첫·마지막 지급월, 지급일, 대체 소득, 추가 지출.
 - 기준 일정 / 첫 입금 지연 / 선택 소득 미발생 / 미확정 소득 수령 / 소득·지출 악화의 다섯 시나리오.
@@ -34,7 +37,7 @@ Windows에서는 `run-local.ps1`로도 실행할 수 있습니다. 이 실행기
 
 기존 `.env` 설정을 서버 시작 시 읽습니다. API 키는 서버에서만 사용하며, 키가 없거나 연결에 실패하면 계산 기능은 계속 사용할 수 있지만 AI 답변은 제공하지 않습니다.
 
-1. `mvp/.env`를 엽니다. 파일이 없다면 새로 만듭니다.
+1. 저장소 루트의 `.env.example`을 `.env`로 복사합니다. `.env`와 실제 API 키는 Git에 포함하지 않습니다.
 2. 로컬 편집기로 `.env`의 `OPENAI_API_KEY`를 입력합니다. **키를 채팅이나 프런트엔드에 붙이지 마세요.**
 3. 필요하면 `OPENAI_MODEL`을 계정에서 접근 가능한 Responses API 지원 모델로 설정합니다. 기본 예시 모델은 `gpt-4.1-mini`입니다.
 4. 서버를 재시작합니다. 환경에 이미 설정된 값이 `.env`보다 우선합니다.
@@ -101,7 +104,7 @@ node scripts/build.mjs
 
 테스트 종류는 계산 엔진, API 계약·보안, 로컬 DOM 단위 테스트입니다. DOM 테스트는 실제 브라우저를 열거나 외부 URL에 접속하지 않습니다. 자동 AI 테스트는 모의 응답입니다. 별도로 로컬 서버와 기존 .env를 이용해 가상 사례의 실제 API 대화를 점검했습니다. 이 소수의 점검은 전반적인 LLM 정확도 평가를 대체하지 않습니다.
 
-2026-08-30 기준 실제 브라우저 접근은 관리 정책 확인 실패로 막혔습니다. 데스크톱·모바일 육안 검증 및 실제 브라우저의 다운로드·인쇄 동작은 아직 미확인입니다. 이를 우회하지 않았습니다. 검증 범위와 남은 점검은 `docs/검증기록.md`를 참고하세요.
+현재 소스의 자동 테스트는 83개입니다. 공개 URL의 화면 응답·주요 파일·동의 검증·실제 AI 답변도 점검했습니다. 데스크톱·모바일의 모든 화면 배치와 실제 브라우저의 다운로드·인쇄 동작을 검증한 것은 아닙니다. 자세한 범위는 [검증 기록](docs/검증기록.md)을 참고하세요.
 
 ## 배포
 
@@ -109,13 +112,15 @@ node scripts/build.mjs
 
 `pnpm build`로 기존 화면과 AI 서버를 함께 묶은 Cloudflare Worker를 만듭니다. 출력은 `dist/server/index.js`이며 `.openai/hosting.json`의 사이트와 D1 `DB` 연결을 사용합니다. API 키는 Sites의 비밀 환경변수 `OPENAI_API_KEY`, 모델은 `OPENAI_MODEL`, 실제 서비스 출처는 `APP_ORIGIN`으로 설정합니다. `.env` 파일과 원문 재무정보는 배포물에 포함하지 않습니다.
 
-`db/schema.ts`와 `drizzle/`은 요청 한도용 테이블을 관리합니다. 새 스키마는 `pnpm db:generate`로 마이그레이션을 생성하고 배포 전에 검토합니다. 2026년 9월 7일 기존 75개와 온라인 서버 7개를 합친 자동 테스트 82개를 통과했습니다.
+`APP_ORIGINS`에 쉼표로 구분한 정확한 주소를 지정하면 기본 배포 주소와 소유 확인을 마친 사용자 도메인을 함께 사용할 수 있습니다. 사용자 도메인은 Sites 연결 등록과 별도로 DNS 소유 확인 및 HTTPS 활성화가 필요합니다.
+
+`db/schema.ts`와 `drizzle/`은 요청 한도용 테이블을 관리합니다. 새 스키마는 `pnpm db:generate`로 마이그레이션을 생성하고 배포 전에 검토합니다. 2026년 9월 7일 기존 75개와 온라인 서버 8개를 합친 자동 테스트 83개를 통과했습니다.
 
 ### AI를 포함한 Node 서버
 
 `node server.mjs`를 실행하는 Node 22 이상 호스트를 사용하세요. `HOST=0.0.0.0`, 서비스가 지정한 `PORT`, `APP_ORIGIN=https://실제도메인`을 설정하고 API 키는 호스트 비밀 환경 변수에 저장합니다. `APP_ORIGIN`은 끝 `/` 없이 지정하며 요청의 Origin과 Host가 일치해야 합니다. HTTPS 종료 프록시는 원래 Host를 유지해야 합니다.
 
-Dockerfile도 제공합니다. 컨테이너 빌드·외부 배포는 이번 작업에서 실행하지 않았습니다.
+Dockerfile도 제공합니다. Docker 컨테이너의 빌드·배포는 별도로 검증해야 합니다.
 
 ```sh
 docker build -t repayment-on .
@@ -140,10 +145,11 @@ js/model.mjs                median·quantile·monthlyPayment·ModelInputError
 js/chart.mjs                SVG 차트·마우스·터치·키보드 툴팁
 lib/ai.mjs                  서버 전용 OpenAI Responses 연동
 server.mjs                  정적 허용 목록·API·요청 제한
+worker/                     Sites 서버·공개 파일 제공·AI 요청 제한
+db/, drizzle/               요청 한도용 데이터베이스 정의·마이그레이션
 tests/                      계산·서버·DOM 단위 테스트
 scripts/                    문법 검사·정적 빌드
 docs/                       기능명세·검증·시연 순서
-legacy-v1/                  v1 구현·데모·회귀 테스트 보관 (공개·배포·기본 테스트 제외)
 ```
 
-API 구현 참고: [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state), [기본 예시 모델](https://developers.openai.com/api/docs/models/gpt-4.1-mini). 선행연구·서비스 비교 자료는 상위 폴더의 개정 기획서 및 선행연구 검토 문서를 참고하세요.
+API 구현 참고: [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state), [기본 예시 모델](https://developers.openai.com/api/docs/models/gpt-4.1-mini).

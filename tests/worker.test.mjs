@@ -47,6 +47,16 @@ test('배포 서버의 대화는 계산 조건을 바꾸지 않고 요청 메타
   assert.ok(!JSON.stringify(rows).includes('192.0.2.1'));assert.ok(!JSON.stringify(rows).includes(body.question));
 });
 
+test('기본 주소와 등록한 사용자 도메인만 AI 요청을 허용한다',async t=>{
+  const db=database(t),custom='https://repayment-on.site';
+  const env={...environment(db),APP_ORIGINS:`${origin}, ${custom}`};
+  const worker=createWorker({assets:{},ask:async()=>({mode:'ai',reply:'계산 결과를 확인했어요.'})});
+  for(const allowed of [origin,custom])assert.equal((await worker.fetch(request(payload(),{origin:allowed}),env)).status,200);
+  for(const denied of ['https://repayment-on.site.evil.example','http://repayment-on.site','https://www.repayment-on.site','null',''])assert.equal((await worker.fetch(request(payload(),{origin:denied}),env)).status,403);
+  const response=await worker.fetch(new Request(custom+'/api/status'),{...env,APP_ORIGIN:''});
+  assert.equal((await response.json()).configured,true);
+});
+
 test('외부 AI 실패는 일반 오류로 돌아오고 사용 중인 요청 자리를 반환한다',async t=>{
   const db=database(t),worker=createWorker({assets:{},ask:async()=>{throw new Error('internal test-secret');}});
   const response=await worker.fetch(request(),environment(db));assert.equal(response.status,502);assert.doesNotMatch(await response.text(),/test-secret|internal/);

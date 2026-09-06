@@ -8,3 +8,5 @@ out/
 coverage/
 .wrangler/
 legacy-v1/
+docs/배포기록_*.md
+docs/사용자도메인_연결안내.md

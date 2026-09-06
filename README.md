@@ -153,3 +153,26 @@ docs/                       기능명세·검증·시연 순서
 ```
 
 API 구현 참고: [Conversation state](https://developers.openai.com/api/docs/guides/conversation-state), [기본 예시 모델](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+
+## ⭐ Contributors | 팀원
+
+- 팀명: 하이바라 하이리턴
+- 
+<table>
+  <tr>
+    <td align="center" width="160">
+      <a href="https://github.com/skguskim">
+        <img src="https://github.com/skguskim.png" width="100" alt="김나현 GitHub 프로필"><br>
+        <strong>김나현</strong><br>
+        <sub>@skguskim</sub>
+      </a>
+    </td>
+    <td align="center" width="160">
+      <a href="https://github.com/seoultech22">
+        <img src="https://github.com/seoultech22.png" width="100" alt="윤영준 GitHub 프로필"><br>
+        <strong>윤영준</strong><br>
+        <sub>@seoultech22</sub>
+      </a>
+  </tr>
+</table>
+

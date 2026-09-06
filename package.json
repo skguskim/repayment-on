@@ -1,0 +1,25 @@
+{
+  "name": "repayment-on-mvp",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "check": "node scripts/check.mjs",
+    "build": "vite build --config vite.sites.config.mjs --configLoader native",
+    "build:sites": "vite build --config vite.sites.config.mjs --configLoader native",
+    "build:static": "node scripts/build.mjs",
+    "db:generate": "drizzle-kit generate"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@openai/sites-vite-plugin": "0.2.0",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "jsdom": "26.1.0",
+    "vite": "^7.3.6"
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f9f7">
+  <meta name="description" content="인턴 급여, 상금, 소득 공백까지. 청년의 미래 현금흐름과 상환 계획을 함께 살펴보는 상환ON.">
+  <title>상환ON · 내일의 소득, 오늘의 상환 계획</title>
+  <link rel="stylesheet" href="/styles.css"><script type="module" src="/js/app.mjs"></script>
+</head>
+<body data-screen="input">
+  <a class="skip" href="#workspace">계산기로 건너뛰기</a>
+  <header class="site-header"><a href="#input" class="logo" id="home-link" aria-label="상환ON 홈">상환<span>ON</span><i aria-hidden="true"></i></a></header>
+  <main>
+    <ol class="screen-progress" aria-label="계산 진행 단계"><li id="progress-input" aria-current="step"><span>1</span> 조건 입력</li><li class="progress-line" aria-hidden="true"></li><li id="progress-results"><span>2</span> 결과 확인</li></ol>
+    <section id="workspace" class="workspace" aria-label="현금흐름 시뮬레이터">
+    <div id="input-screen">
+    <section class="intro">
+      <h1>다가올 내 잔액,<br><em>미리 확인해요.</em></h1><p class="intro-copy">소득·지출과 상환 일정을 입력해 주세요.</p>
+    </section>
+    <section class="demo-section" aria-label="가상 사례 선택"><div class="section-line"><h2>예시로 간편하게 시작</h2><button id="blank-button" class="text-button" type="button">직접 입력 ↗</button></div><div id="demo-list" class="demo-list"></div><p id="demo-label" class="micro">모든 사례는 가상 데이터입니다.</p></section>
+      <div class="input-card">
+        <div class="card-heading"><div><span class="eyebrow" id="input-step-label">1 / 3</span><h2 id="input-title" tabindex="-1">내 조건 입력</h2></div><span class="unit">금액 단위: 만원</span></div>
+        <div class="input-tabs" role="tablist" aria-label="입력 단계"><button type="button" role="tab" id="tab-cash" aria-controls="panel-cash" aria-selected="true" data-input-tab="cash">생활과 소득</button><button type="button" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="false" tabindex="-1" data-input-tab="events">미래소득</button><button type="button" role="tab" id="tab-loan" aria-controls="panel-loan" aria-selected="false" tabindex="-1" data-input-tab="loan">상환 조건</button></div>
+        <form id="plan-form" novalidate autocomplete="off">
+          <div id="error-box" class="notice danger" role="alert" tabindex="-1" hidden></div>
+          <div role="tabpanel" id="panel-cash" aria-labelledby="tab-cash" class="input-panel"></div>
+          <div role="tabpanel" id="panel-events" aria-labelledby="tab-events" class="input-panel" hidden></div>
+          <div role="tabpanel" id="panel-loan" aria-labelledby="tab-loan" class="input-panel" hidden></div>
+          <div class="input-navigation"><button id="previous-input" type="button" class="subtle-button" hidden>← 이전 조건</button><button id="next-input" type="button" class="subtle-button">미래소득 입력 →</button></div>
+          <p id="dirty-note" class="micro draft-note" aria-live="polite" hidden></p>
+          <div class="calculate-area"><button id="calculate" type="submit" class="primary wide">내 현금 흐름 계산하기 <span aria-hidden="true">→</span></button></div>
+        </form>
+      </div>
+    </div>
+      <div id="results" class="results" aria-label="분석 결과" hidden>
+        <div class="results-toolbar"><button id="edit-plan" type="button" class="text-button">← 조건 수정</button></div>
+        <div class="result-heading"><h1 id="result-title" tabindex="-1">앞으로의 잔액을<br>확인해보세요.</h1><p class="micro" id="result-period"></p></div>
+        <div class="report-actions"><button type="button" id="download" class="subtle-button" disabled>보고서 저장 ↓</button><button type="button" id="print" class="subtle-button" disabled>인쇄</button></div>
+        <div id="result-status" class="result-status" aria-live="polite"></div>
+        <h2 class="scenario-heading">상황이 달라지면 어떨까요?</h2><div id="scenario-tabs" class="scenario-tabs" role="tablist" aria-label="비교 시나리오"></div>
+        <div id="scenario-view" role="tabpanel" tabindex="0"><div id="metrics" class="metrics"></div>
+          <article class="chart-card"><div class="section-line"><h3>월말 잔액의 흐름</h3><span id="chart-period" class="micro"></span></div><div class="legend"><span class="legend-base">기준 일정</span><span class="legend-active">선택 시나리오</span><span class="legend-floor">최소 유지 잔액</span></div><div id="cash-chart"></div><p id="scenario-note" class="chart-note"></p><p class="micro">월중 잔액은 날짜별 내역에서 확인할 수 있어요.</p></article>
+          <details class="detail-card"><summary>월별 계산표와 날짜별 내역</summary><div id="ledger"></div></details>
+        </div>
+        <article class="assistant-card" id="assistant-card">
+          <div class="chat-heading"><h2>내 상황에 대해 물어보세요</h2><button type="button" id="clear-chat" class="text-button" hidden>대화 지우기</button></div>
+          <p id="chat-empty" class="micro">현재 잔액과 상환 일정을 참고해 함께 살펴볼게요.</p>
+          <div id="chat-messages" class="chat-messages" role="log" aria-label="AI와의 대화" aria-live="polite" aria-relevant="additions text" tabindex="0" hidden></div>
+          <div class="quick-questions"><button type="button" data-question="내가 이거 이번 달에 절반 갚으면 어떻게 돼?" disabled>이번 달에 절반 갚으면?</button><button type="button" data-question="내 돈이 언제 가장 부족해져?" disabled>언제 잔액이 가장 적을까?</button><button type="button" data-question="첫 급여가 늦어지면 생활비는 괜찮을까?" disabled>첫 급여가 늦어진다면?</button></div>
+          <div id="chat-error" class="chat-error" role="status" hidden><p id="chat-error-text"></p><button type="button" id="retry-chat" class="subtle-button" hidden>다시 보내기</button></div>
+          <form id="ask-form"><label for="question" class="sr-only">내 상황에 대해 질문하기</label><div class="ask-row"><textarea id="question" rows="2" maxlength="2000" placeholder="예: 이번 달에 절반 갚으면 어떻게 돼?" autocomplete="off" disabled></textarea><button type="submit" id="ask-button" class="primary" disabled>보내기</button></div><label id="ai-consent-row" class="consent" hidden><input id="ai-consent" type="checkbox" disabled aria-describedby="ai-sharing-note">외부 AI로 질문하기 <span>(선택)</span></label></form>
+          <details id="ai-privacy" class="privacy-details" hidden><summary>전송되는 정보</summary><p id="ai-sharing-note">동의 후 질문하면 현재 계획과 최근 대화가 서비스 서버로 전송됩니다. OpenAI에는 질문·최근 대화, 현재 선택한 상황과 계산 결과, 소득·지출·대출 조건 및 예정 소득의 이름·금액·일정이 전달됩니다. 이름이나 계좌번호는 입력하지 마세요.</p><a href="https://developers.openai.com/api/docs/guides/your-data" target="_blank" rel="noopener noreferrer">OpenAI 데이터 처리 안내 ↗</a></details>
+        </article>
+      </div>
+    </section>
+  </main>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

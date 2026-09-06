@@ -1,0 +1,9 @@
+.env
+.env.*
+.git
+legacy-v1
+tests
+docs
+dist
+node_modules
+*.log

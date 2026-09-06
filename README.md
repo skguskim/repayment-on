@@ -157,7 +157,7 @@ API 구현 참고: [Conversation state](https://developers.openai.com/api/docs/g
 ## ⭐ Contributors | 팀원
 
 - 팀명: 하이바라 하이리턴
-- 
+  
 <table>
   <tr>
     <td align="center" width="160">
